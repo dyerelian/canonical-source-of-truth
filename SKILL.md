@@ -70,17 +70,19 @@ Follow `references/canonical-project-page.md`:
   to the configured Closed index list.
 
 Apply the **page content rules** every time: spell out every acronym on first use with the
-acronym in parentheses; attribute to the meeting/discussion, **never** name a capture/notes
-tool; keep it public-facing and self-contained.
+acronym in parentheses; attribute to the meeting/discussion, **never** name or link a
+capture/notes tool (no Granola links anywhere on the page); **never** put GTD item keys
+(`P-###`/`A-###`/`W-###`) or "GTD"/"next action" tracking language on the page; keep it
+public-facing and self-contained.
 
 ### 4. Link to the GTD workbook (only if tracked there)
 
 If the project is tracked in the GTD workbook, link the two per
 `references/canonical-project-page.md` → "Linking to the GTD workbook (optional)": store
 `Canonical page: <url>` in the project's `notes` (column **O**) via the **`add-gtd-items`**
-writer, and put the GTD Project ID in the page's Overview table. If the project is **not** in
-the workbook, skip this — offer to add a project row only if the user wants it. Never require the
-workbook.
+writer. The link is one-directional — workbook → page only; do **not** put the GTD Project ID
+or any GTD key on the page. If the project is **not** in the workbook, skip this — offer to add
+a project row only if Dan wants it. Never require the workbook.
 
 ### 5. Report
 
