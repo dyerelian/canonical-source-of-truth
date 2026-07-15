@@ -67,7 +67,6 @@ Then **add the new page to the Active Projects index list**:
     <tr><th>Owner</th><td></td></tr>
     <tr><th>Area</th><td></td></tr>
     <tr><th>Target date</th><td></td></tr>
-    <tr><th>GTD Project ID</th><td></td></tr>
   </tbody>
 </table>
 <h2>Key Links</h2>
@@ -97,7 +96,9 @@ Then **add the new page to the Active Projects index list**:
 </ul>
 ```
 
-Leave the `GTD Project ID` cell blank when the project is not tracked in the workbook.
+Do **not** put GTD item keys (project/action/waiting-for IDs) on the page — the canonical
+page carries no internal tracking keys. The page↔workbook link is stored only on the
+workbook side (see "Linking to the GTD workbook").
 
 ### After creating
 
@@ -158,6 +159,12 @@ Everything written to a canonical page is publicly facing, so:
 - **Attribute to the meeting or discussion itself, never to any capture / notes tool.**
   Cite the event — e.g. "per the 2026-07-07 Scott 1:1" — not the tool the notes came
   from. Do not name unapproved or internal-only tooling anywhere on the page.
+- **No links to capture / notes tools, and no internal tracking keys.** Never link
+  Granola (or any other notes/capture tool) in Key Links or anywhere on the page, and
+  never write GTD item keys (project/action/waiting-for IDs such as `P-###`, `A-###`,
+  `W-###`) or internal "GTD"/"next action" tracking language on the page. Describe status
+  in plain, public-facing terms (e.g. "Done 2026-06-30", "awaiting ACE Board support")
+  instead. (Standing rule set by Dan 2026-07-15.)
 - Keep the tone professional and self-contained: no private asides, no raw transcript
   dumps, and no links to tools that are not approved for the page's audience.
 
@@ -192,5 +199,6 @@ Only when the project is tracked in Dan's GTD workbook — otherwise skip this s
   `scripts/Add-GtdItems.ps1` writer and `references/workbook-schema.md` — do not
   hand-write the `.xlsx`. If there is no matching project row yet, offer to add one via
   `add-gtd-items`.
-- **Put the GTD Project ID in the page's Overview table** (`GTD Project ID` cell) so the
-  link is visible from the page too.
+- **The link is one-directional: workbook → page only.** Do not put the GTD Project ID
+  (or any GTD key) on the page — the page carries no internal tracking keys (see "Page
+  content rules"). The `Canonical page: <url>` note in the workbook is the sole link.
