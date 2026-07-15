@@ -1,8 +1,8 @@
 # Canonical Source of Truth (`source-of-truth` skill)
 
-A [Claude Code](https://claude.ai/code) **skill** that creates, updates, and closes a
+A Claude Code and Codex **skill** that creates, updates, and closes a
 project's **canonical Confluence "source of truth" page** — for **any** project, whether or
-not it is tracked in Dan's Getting Things Done (GTD) workbook.
+not it is tracked in a Getting Things Done (GTD) workbook.
 
 Confluence is the publicly-facing single source of truth per project (inspired by Naomi's
 "Canonical Everything" — one authoritative page each). This skill owns that process; the GTD
@@ -13,7 +13,7 @@ keeping their own copy.
 ## What it does
 
 - **Create** a canonical page for a new project/initiative (or reconcile an ad-hoc page onto
-  the convention), placed under `Active Projects` in the `PROD` Confluence space and linked
+  the convention), placed under the configured `Active Projects` Confluence page and linked
   into the Active Projects index list.
 - **Update** an existing page on any material change — merge into Overview / Milestones /
   Decisions / Open Questions-Risks / Updates (never overwrite).
@@ -26,23 +26,37 @@ keeping their own copy.
 
 | Path | Purpose |
 |------|---------|
-| `SKILL.md` | The skill definition and workflow (loaded by Claude Code). |
-| `references/canonical-project-page.md` | **Authoritative** create/update/close mechanics, Confluence coordinates, storage-format body template, and page content rules. Referenced by the GTD and close-day skills. |
+| `SKILL.md` | The skill definition and workflow (loaded by Claude Code and Codex). |
+| `agents/openai.yaml` | Codex UI metadata. |
+| `config/source-of-truth.example.json` | Tracked example schema for local Confluence setup. |
+| `references/canonical-project-page.md` | **Authoritative** create/update/close mechanics, Confluence page workflow, storage-format body template, and page content rules. Referenced by the GTD and close-day skills. |
+| `references/confluence-instance.md` | Configuration resolution and fresh-install setup rules. |
 | `references/context-sources.md` | How to gather context from each source, read-only. |
 | `scripts/read_msg.py` | Parse a saved Outlook `.msg` file (subject/from/to/date/attachments/body). Requires `extract_msg`. |
-| `install.ps1` | Creates the `~/.claude/skills/source-of-truth` junction into this repo. |
+| `install.ps1` | Creates live skill junctions into this repo for Claude, Codex, or both. |
 
-## Confluence coordinates
+## Fresh install
 
-Space `PROD`; `Active Projects` index page ID `5728960520`; `Closed Projects` index page ID
-`5728763908`. Per-project child pages live under Active Projects; a project's active/closed
-state is tracked by which index **list** its link sits in (the Confluence MCP tools cannot
-re-parent pages).
+Clone the repo, then run the installer from the repo root:
+
+```powershell
+.\install.ps1 -SiteUrl "https://your-site.atlassian.net/wiki" -CloudId "<cloud-id>" -SpaceKey "<SPACE>" -ActiveIndexPageId "<active-page-id>" -ClosedIndexPageId "<closed-page-id>"
+```
+
+The installer creates Claude/Codex skill junctions and writes
+`config/source-of-truth.local.json`, which is ignored by Git. If Active/Closed page IDs are not
+known yet, omit them; the skill will search by the configured titles and ask before creating
+missing index pages. For automation, add `-NoPrompt` to write unresolved values without
+interactive prompts.
+
+Per-project child pages live under Active Projects; a project's active/closed state is tracked
+by which index **list** its link sits in (the Confluence MCP tools may not be able to re-parent
+pages).
 
 ## Consumers (cross-repo dependency)
 
-Two sibling skills reference this repo by absolute path
-(`C:\Users\E724101\.claude\skills\source-of-truth\references\canonical-project-page.md`):
+Sibling GTD/close-day skills can reference this repo's
+`references/canonical-project-page.md` instead of keeping their own copy:
 
 - **`add-gtd-items`** (repo `AAA-claude-skill-GTD`) — creates/updates a project's page when a
   project row is added or changes.
@@ -51,12 +65,14 @@ Two sibling skills reference this repo by absolute path
 
 ## Sync model (junction)
 
-On the author's machine this repo is the **single source of truth**, and the live skill under
-`~/.claude/skills/source-of-truth` is a **directory junction** pointing at the repo root — so
-editing in either place touches the same files, with no copying and no drift.
+This repo is the **single source of truth**, and the live skill under
+`~/.claude/skills/source-of-truth` and/or `~/.codex/skills/source-of-truth` is a **directory
+junction** pointing at the repo root — so editing in either place touches the same files, with
+no copying and no drift.
 
 ```
 ~/.claude/skills/source-of-truth  ──junction──▶  <repo root>
+~/.codex/skills/source-of-truth   ──junction──▶  <repo root>
 ```
 
 Workflow: edit wherever's convenient, then commit/push from the repo:
@@ -66,18 +82,15 @@ cd ~/repos/Source-of-Truth-Skill
 git add -A; git commit -m "..."; git push
 ```
 
-(Re)create the junction on this machine — or on a fresh clone — by running `install.ps1`, or:
+(Re)create the junctions on this machine — or on a fresh clone — by running:
 
 ```powershell
-$live = Join-Path $env:USERPROFILE '.claude\skills\source-of-truth'
-$repo = $PSScriptRoot   # the cloned repo's root
-if (Test-Path $live) { Remove-Item $live -Recurse -Force }
-New-Item -ItemType Junction -Path $live -Target $repo | Out-Null
+.\install.ps1
 ```
 
 Directory junctions need **no admin rights or Developer Mode** on Windows and are transparent
-to Claude Code. They are local to a machine — on a new machine, clone then run `install.ps1`.
+to Claude Code and Codex. They are local to a machine — on a new machine, clone then run
+`install.ps1`.
 
-> **Note on paths:** `SKILL.md` and the references contain absolute Windows paths specific to
-> the author's machine (skills directory, Python interpreter, workbook location). Adjust these
-> for your environment before use.
+> **Note on paths:** runtime Confluence values belong in `config/source-of-truth.local.json`,
+> not tracked Markdown files.

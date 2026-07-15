@@ -1,18 +1,34 @@
 ---
 name: source-of-truth
-description: Create, update, or close a project's canonical Confluence "source of truth" page for any project — GTD-tracked or ad-hoc. Use when the user asks to create/spin up a source of truth, a canonical page, a project page, or a single source of truth for a project or initiative; to update/refresh a project's Confluence page with a decision, milestone, status change, risk, or new update; or to close out a project's page when it's done. Actively gathers context from Granola, email/.msg files, Slack, Atlassian, SharePoint/local files, and the GTD workbook to draft or refresh the page.
+description: Create, update, or close a project's canonical Confluence "source of truth" page for any project, GTD-tracked or ad-hoc, in Codex or Claude Code. Use when the user asks to create/spin up a source of truth, canonical page, project page, or single source of truth for a project or initiative; to update/refresh a project's Confluence page with a decision, milestone, status change, risk, or new update; or to close out a project's page when it's done. Uses connected Confluence/Atlassian tools plus read-only context from Granola, email/.msg files, Slack, Jira, SharePoint/local files, and the GTD workbook.
 ---
 
 # Source of Truth (Canonical Project Page)
 
 Confluence is the **publicly-facing single source of truth** for every project. This skill
 creates, updates, and closes those canonical pages for **any** project — whether or not it is
-tracked in Dan's Getting Things Done (GTD) workbook. (Inspired by Naomi's "Canonical
+tracked in a Getting Things Done (GTD) workbook. (Inspired by Naomi's "Canonical
 Everything" — one authoritative page per project.)
 
 This skill **owns** the canonical-page process. The GTD skills (`add-gtd-items`, `gtd`) and
 `/close-day` reference this skill's `references/canonical-project-page.md` for the create /
 update / close mechanics rather than keeping their own copy.
+
+## Runtime compatibility
+
+- **Configuration:** Read `config/source-of-truth.local.json` first. If it is missing, read
+  `config/source-of-truth.example.json` for the expected shape and ask the user to run
+  `install.ps1` with their Confluence values. `references/confluence-instance.md` explains the
+  config fields and setup rules.
+- **Codex:** Prefer the connected `mcp__my_atlassian` Confluence tools when present
+  (`confluence_get_page`, `confluence_get_page_by_title`, `confluence_search`,
+  `confluence_create_page`, `confluence_update_page`). If only the generic Atlassian
+  connector is available, use `mcp__atlassian` tools and the cloud/site values in local config.
+- **Claude Code:** Use the equivalent Confluence MCP tools exposed in that environment. The
+  same workflow applies even if the namespace renders with hyphens instead of underscores.
+- Before creating or updating project pages, verify the configured Confluence space and
+  Active/Closed index page IDs. Do not create project pages until the Active index page ID is
+  configured or explicitly discovered.
 
 ## When to use
 
@@ -27,7 +43,8 @@ update / close mechanics rather than keeping their own copy.
 ### 1. Identify the project & check for an existing page
 
 - Determine the project name and whether it already has a page:
-  - Search space `PROD` by title (`confluence_get_page_by_title` / `confluence_search`).
+  - Search the configured Confluence space by title (`confluence_get_page_by_title` /
+    `confluence_search`, or the generic Atlassian search/page tools).
   - If the project is in the GTD workbook, check its Projects-row `notes` (column **O**) for
     `Canonical page: <url>`.
 - If a page exists → this is an **update** (or reconcile). If not → this is a **create**.
@@ -45,12 +62,12 @@ status, target dates, key links, decisions, milestones, risks, updates). Always 
 
 Follow `references/canonical-project-page.md`:
 - **Create** — build the page from the storage-format body template, create it under
-  `Active Projects` (space `PROD`, parent `5728960520`), then append its link to the Active
+  the configured `Active Projects` parent/index page, then append its link to the Active
   Projects index list.
 - **Update** — `confluence_get_page`, **merge** the change into Overview / Milestones /
   Decisions / Open Questions-Risks / Updates (never blank a section), `confluence_update_page`.
 - **Close** — flip the page Status to Closed, move its link from the Active index list
-  (`5728960520`) to the Closed index list (`5728763908`).
+  to the configured Closed index list.
 
 Apply the **page content rules** every time: spell out every acronym on first use with the
 acronym in parentheses; attribute to the meeting/discussion, **never** name a capture/notes
@@ -62,7 +79,7 @@ If the project is tracked in the GTD workbook, link the two per
 `references/canonical-project-page.md` → "Linking to the GTD workbook (optional)": store
 `Canonical page: <url>` in the project's `notes` (column **O**) via the **`add-gtd-items`**
 writer, and put the GTD Project ID in the page's Overview table. If the project is **not** in
-the workbook, skip this — offer to add a project row only if Dan wants it. Never require the
+the workbook, skip this — offer to add a project row only if the user wants it. Never require the
 workbook.
 
 ### 5. Report
@@ -73,11 +90,12 @@ created / updated / closed and what changed, and any GTD linkage made.
 ## References & scripts
 
 - `references/canonical-project-page.md` — the authoritative create / update / close mechanics,
-  Confluence coordinates, body template, and page content rules. **This is the file the GTD
+  Confluence page mechanics, body template, and page content rules. **This is the file the GTD
   skills and `/close-day` point at.**
+- `references/confluence-instance.md` — configuration resolution rules and fresh-install setup.
 - `references/context-sources.md` — how to gather context from each source, read-only.
 - `scripts/read_msg.py` — parse a saved Outlook `.msg` file (subject/from/to/date/attachments/
-  body). Run via the full interpreter path `C:\Program Files\Python312\python.exe`.
+  body). Run with `py`, `python`, or a known full Python interpreter path.
 
 ## Guardrails
 

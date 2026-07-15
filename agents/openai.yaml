@@ -1,0 +1,4 @@
+interface:
+  display_name: "Source of Truth"
+  short_description: "Canonical Confluence project pages"
+  default_prompt: "Use $source-of-truth to create or update the canonical Confluence source-of-truth page for this project."

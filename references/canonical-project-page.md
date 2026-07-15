@@ -15,17 +15,30 @@ reflects current reality.
 All text written to a page follows the writing rules in "Page content rules" below.
 
 > **GTD linkage is optional.** This process works for **any** project, whether or not it
-> is tracked in Dan's GTD workbook. If the project *is* in the workbook, also link the two
+> is tracked in a Getting Things Done (GTD) workbook. If the project *is* in the workbook, also link the two
 > (see "Linking to the GTD workbook (optional)"). If it is not, skip every workbook step —
 > the Confluence page stands on its own.
 
+## Runtime and instance configuration
+
+Before any Confluence write, read `config/source-of-truth.local.json`. If it is missing, read
+`config/source-of-truth.example.json` for the expected shape and ask the user to run
+`install.ps1` with their Confluence values.
+
+- Use the configured site, cloud ID, space key, Active Projects index page ID, and Closed
+  Projects index page ID for the current user's Confluence instance.
+- If the Active/Closed IDs are marked unresolved, search by exact title in the configured
+  space. If still missing, ask the user where to place the indexes or create those index pages only
+  after an explicit user request or when `behavior.allowCreateMissingIndexes` is `true`.
+- In Codex, prefer the `mcp__my_atlassian` tools when they exist. In Claude Code, use the
+  equivalent `my-atlassian`/Confluence MCP tools. With the generic Atlassian connector, pass the
+  configured `cloudId` value and request `contentFormat: "html"` for page bodies.
+
 ## Where pages go
 
-- **Space key:** `PROD`
-- **Active index page:** `Active Projects` — content ID `5728960520`
-  (https://autoclub.atlassian.net/wiki/spaces/PROD/pages/5728960520/Active+Projects)
-- **Closed index page:** `Closed Projects` — content ID `5728763908`
-  (https://autoclub.atlassian.net/wiki/spaces/PROD/pages/5728763908/Closed+Projects)
+- **Space key:** read from local config.
+- **Active index page:** `Active Projects`, using the configured content ID.
+- **Closed index page:** `Closed Projects`, using the configured content ID.
 
 Each project gets its own child page under `Active Projects`. The two index pages
 (`Active Projects` / `Closed Projects`) are **link lists** that are the canonical
@@ -35,25 +48,27 @@ list membership — not the page's tree parent — is the source of truth for st
 
 ## Creating a page for a new project
 
-Use `mcp__my-atlassian__confluence_create_page`:
+Use a connected Confluence create-page tool:
 
-- `space_key`: `PROD`
-- `parent_id`: `5728960520` (Active Projects)
+- `space_key` / `spaceId`: the configured space key from local config
+- `parent_id` / `parentId`: the configured Active Projects page ID
 - `title`: the project name (must be unique in the space — if a page with that
   title already exists, reuse/link it instead of creating a duplicate)
 - `body_html`: the storage-format template below (fill in known values; leave
   placeholders for what isn't known yet)
 
-**Standing rule (set by Dan 2026-06-29): every new project gets a canonical
+**Standing rule: every new project gets a canonical
 Confluence page — create it automatically as part of adding the project. Do not
 ask first.** Always include the project's **SharePoint folder** (and any other
 working hub: Jira board, Slack channel, key docs) under **Key Links** — link the
 SharePoint location explicitly in the page body.
 
 Then **add the new page to the Active Projects index list**:
-1. `confluence_get_page` on `5728960520` to read its current `body_storage_html`.
+1. `confluence_get_page` on the configured Active Projects page ID to read its current
+   `body_storage_html`.
 2. Append a list item linking to the new page.
-3. `confluence_update_page` on `5728960520` with the updated body (version
+3. `confluence_update_page` on the configured Active Projects page ID with the updated body
+   (version
    auto-bumps).
 
 ### Body template (Confluence storage format)
@@ -104,7 +119,7 @@ Leave the `GTD Project ID` cell blank when the project is not tracked in the wor
 1. Capture the returned page URL.
 2. **If the project is in the GTD workbook**, link the two (see "Linking to the GTD
    workbook (optional)"). If it is not, skip this.
-3. Report the page title, URL, and (if applicable) the GTD project ID/row back to Dan.
+3. Report the page title, URL, and (if applicable) the GTD project ID/row back to the user.
 
 ## Updating an existing page
 
@@ -127,7 +142,7 @@ Skip pure capture noise (e.g. an unprocessed inbox thought that isn't yet a deci
 - If the project is in the GTD workbook, read the canonical URL from its `notes`
   (column **O**, stored as `Canonical page: <url>`) and take the numeric page ID from the URL.
 - Otherwise, locate it by title with `confluence_search` /
-  `confluence_get_page_by_title` in space `PROD`.
+  `confluence_get_page_by_title` in the configured space.
 - If the project has no page yet, create one via "Creating a page for a new project" first.
 
 **How to update — merge, never overwrite:**
@@ -169,18 +184,18 @@ canonical page to the closed list:
 
 1. **Flip the page Status** to `Closed` (or `Complete`): `confluence_get_page` on
    the project page, edit the Status cell in the Overview table, `confluence_update_page`.
-2. **Remove the link from Active Projects** (`5728960520`): get body, drop the
+2. **Remove the link from Active Projects**: get body, drop the
    project's list item, update.
-3. **Add the link to Closed Projects** (`5728763908`): get body, append the
+3. **Add the link to Closed Projects**: get body, append the
    project's list item, update.
 
 Note: the page's tree parent stays under Active Projects (the tools can't
-re-parent); the index-list membership is what marks it closed. Dan can drag it in
-the Confluence tree manually if he wants the hierarchy to match.
+re-parent); the index-list membership is what marks it closed. The user can drag it in
+the Confluence tree manually if they want the hierarchy to match.
 
 ## Linking to the GTD workbook (optional)
 
-Only when the project is tracked in Dan's GTD workbook — otherwise skip this section entirely.
+Only when the project is tracked in a Getting Things Done (GTD) workbook — otherwise skip this section entirely.
 
 - **Store the page URL in the project row.** Put the URL into the project's `notes`
   field (workbook column **O**), prefixed `Canonical page: <url>`, so it sits alongside

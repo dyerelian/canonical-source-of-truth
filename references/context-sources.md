@@ -8,7 +8,7 @@ decisions (with dates), milestones, risks/open questions, and notable updates.
 
 ## Local files (SharePoint / OneDrive / Downloads)
 
-- Dan often drops project materials in a OneDrive/SharePoint `_Initiatives\<Project>` folder
+- The user may drop project materials in a OneDrive/SharePoint `_Initiatives\<Project>` folder
   or in `Downloads`. Ask for or confirm the folder, then Glob filenames and read the relevant
   ones.
 - **Slide decks (`.pptx`)** — extract text via `python-pptx` (or unzip `ppt/slides/slideN.xml`
@@ -22,9 +22,11 @@ decisions (with dates), milestones, risks/open questions, and notable updates.
 
 - For a forwarded/saved **`.msg`** file, parse it with the bundled helper
   `scripts/read_msg.py` (uses `extract_msg`) — it prints subject, from/to, date,
-  attachment names, and body. Invoke via the full interpreter path:
+  attachment names, and body. Locate the active skill directory first, then invoke the script
+  with `py`, `python`, or a known full interpreter path. Examples:
   ```powershell
-  & 'C:\Program Files\Python312\python.exe' "C:\Users\E724101\.claude\skills\source-of-truth\scripts\read_msg.py" "<path-to.msg>"
+  py "<skill-dir>\scripts\read_msg.py" "<path-to.msg>"
+  & 'C:\Program Files\Python312\python.exe' "<skill-dir>\scripts\read_msg.py" "<path-to.msg>"
   ```
 - For live Outlook mail, search narrowly for the project name, key people, decisions, and
   dates. Read only plausibly relevant messages. **Never** send, forward, delete, or modify
@@ -43,7 +45,7 @@ decisions (with dates), milestones, risks/open questions, and notable updates.
 - Use the `slack` MCP for recent project-channel commitments, decisions, blockers, and
   stakeholder friction.
 - Public-channel search is fine when relevant. For private channels/DMs, proceed only with
-  Dan's consent.
+  the user's consent.
 - Search narrowly: project name, key people, `decision`, `blocker`, `follow up`, `owner`,
   dates. **Never** post or draft Slack messages while gathering.
 
@@ -51,7 +53,8 @@ decisions (with dates), milestones, risks/open questions, and notable updates.
 
 - Use the `my-atlassian` MCP to find the project's Jira epic/board and any existing
   Confluence pages (so you don't create a duplicate and can cross-link).
-- Before creating a page, **search `PROD` for an existing page** with the project's title.
+- Before creating a page, search the configured Confluence space for an existing page with the
+  project's title.
 - Capture page-relevant facts only: owner, status, due date, blocker, decision needed,
   next milestone, at-risk work.
 

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "confluence": {
+    "siteUrl": "",
+    "cloudId": "",
+    "spaceKey": "",
+    "activeIndex": {
+      "title": "Active Projects",
+      "pageId": ""
+    },
+    "closedIndex": {
+      "title": "Closed Projects",
+      "pageId": ""
+    }
+  },
+  "behavior": {
+    "allowCreateMissingIndexes": false
+  }
+}
