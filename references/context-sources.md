@@ -18,6 +18,18 @@ decisions (with dates), milestones, risks/open questions, and notable updates.
   `word/document.xml` when no better parser is available.
 - Always capture the **SharePoint folder link** for the page's **Key Links** section.
 
+## Project-specific skills
+
+- Check for project-local skill documentation under `.agents/skills/*/SKILL.md` when the
+  project workspace has an `.agents/skills` folder, and include only skills that directly
+  support future work on that project.
+- Prefer the skill `name` from frontmatter or the folder name, plus a short use statement
+  derived from the frontmatter description or `agents/openai.yaml` metadata.
+- Include explicitly user-named skills when they are relevant to the project workflow even
+  if they are not stored under `.agents/skills`.
+- Keep the canonical page public-facing: do not list every global/system/BMAD skill, do not
+  include local filesystem paths, and do not expose internal process notes.
+
 ## Email (`.msg` files and Outlook)
 
 - For a forwarded/saved **`.msg`** file, parse it with the bundled helper

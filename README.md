@@ -15,12 +15,14 @@ keeping their own copy.
 - **Create** a canonical page for a new project/initiative (or reconcile an ad-hoc page onto
   the convention), placed under the configured `Active Projects` Confluence page and linked
   into the Active Projects index list.
-- **Update** an existing page on any material change — merge into Overview / Milestones /
-  Decisions / Open Questions-Risks / Updates (never overwrite).
+- **Update** an existing page on any material change — merge into Overview / Key Links /
+  Skills / Milestones / Decisions / Open Questions-Risks / Updates (never overwrite).
 - **Close** a project's page — flip Status to Closed and move its link from the Active to the
   Closed index list.
 - **Gather context** first from Granola, email/`.msg` files, Slack, Atlassian, SharePoint /
   local files, and the GTD workbook (all read-only).
+- **Document project-specific skills** when useful, using a compact optional Skills section
+  after Key Links and before Milestones.
 
 ## Repository contents
 
@@ -29,7 +31,7 @@ keeping their own copy.
 | `SKILL.md` | The skill definition and workflow (loaded by Claude Code and Codex). |
 | `agents/openai.yaml` | Codex UI metadata. |
 | `config/source-of-truth.example.json` | Tracked example schema for local Confluence setup. |
-| `references/canonical-project-page.md` | **Authoritative** create/update/close mechanics, Confluence page workflow, storage-format body template, and page content rules. Referenced by the GTD and close-day skills. |
+| `references/canonical-project-page.md` | **Authoritative** create/update/close mechanics, Confluence page workflow, optional project-specific Skills section, storage-format body template, and page content rules. Referenced by the GTD and close-day skills. |
 | `references/confluence-instance.md` | Configuration resolution and fresh-install setup rules. |
 | `references/context-sources.md` | How to gather context from each source, read-only. |
 | `scripts/read_msg.py` | Parse a saved Outlook `.msg` file (subject/from/to/date/attachments/body). Requires `extract_msg`. |

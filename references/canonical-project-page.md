@@ -61,7 +61,9 @@ Use a connected Confluence create-page tool:
 Confluence page — create it automatically as part of adding the project. Do not
 ask first.** Always include the project's **SharePoint folder** (and any other
 working hub: Jira board, Slack channel, key docs) under **Key Links** — link the
-SharePoint location explicitly in the page body.
+SharePoint location explicitly in the page body. If the project has relevant
+project-specific skills, include a compact **Skills** section after **Key Links** and
+before **Milestones**.
 
 Then **add the new page to the Active Projects index list**:
 1. `confluence_get_page` on the configured Active Projects page ID to read its current
@@ -91,6 +93,13 @@ Then **add the new page to the Active Projects index list**:
   <li>Slack channel: </li>
   <li>Related docs: </li>
 </ul>
+<h2>Skills</h2>
+<table>
+  <tbody>
+    <tr><th>Skill</th><th>Use</th></tr>
+    <tr><td></td><td></td></tr>
+  </tbody>
+</table>
 <h2>Milestones</h2>
 <ul>
   <li></li>
@@ -114,6 +123,13 @@ Then **add the new page to the Active Projects index list**:
 Do **not** put GTD item keys (project/action/waiting-for IDs) on the page — the canonical
 page carries no internal tracking keys. The page↔workbook link is stored only on the
 workbook side (see "Linking to the GTD workbook").
+
+The **Skills** section is optional; omit the block entirely when no project-relevant skills
+would help future agents work on the project. Use one row per skill with the skill folder/name
+in `Skill` and a concise public-facing purpose in `Use`. Prefer project-local skills
+discovered under `.agents/skills/*/SKILL.md` and skills explicitly named by the user or
+project materials. Do not list every global/system/BMAD skill, do not include local file
+paths, and do not expose internal process notes.
 
 ### After creating
 
@@ -152,6 +168,10 @@ Skip pure capture noise (e.g. an unprocessed inbox thought that isn't yet a deci
 2. **Merge into the existing body, preserving everything already there:**
    - **Overview table** — update only the cells that changed (Status, Owner, Target
      date, Next milestone).
+   - **Key Links** — add or update only confirmed working hubs and keep unsupported or
+     unapproved links off the page.
+   - **Skills** — add the section after Key Links and before Milestones when relevant;
+     update rows by skill name, remove duplicates, and keep only project-relevant skills.
    - **Milestones** — mark items done / add new ones.
    - **Decisions** — append a dated bullet per decision (never remove past decisions).
    - **Open Questions / Risks** — add new ones; mark resolved ones resolved.
