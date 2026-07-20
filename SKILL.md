@@ -54,9 +54,10 @@ update / close mechanics rather than keeping their own copy.
 Pull real context before writing, per `references/context-sources.md`:
 Granola meetings, email/`.msg` files (via `scripts/read_msg.py`), Slack, Atlassian
 (Jira/Confluence), SharePoint/OneDrive/Downloads folders and local files, and the GTD
-workbook. Keep searches narrow and recent; capture only page-relevant facts (outcome, owner,
-status, target dates, key links, decisions, milestones, risks, updates). Always capture the
-**SharePoint folder link** for Key Links.
+workbook. Also check for project-specific skills when the project maintains local skill
+documentation. Keep searches narrow and recent; capture only page-relevant facts (outcome,
+owner, status, target dates, key links, relevant skills, decisions, milestones, risks,
+updates). Always capture the **SharePoint folder link** for Key Links.
 
 ### 3. Create / Update / Close the page
 
@@ -64,8 +65,9 @@ Follow `references/canonical-project-page.md`:
 - **Create** — build the page from the storage-format body template, create it under
   the configured `Active Projects` parent/index page, then append its link to the Active
   Projects index list.
-- **Update** — `confluence_get_page`, **merge** the change into Overview / Milestones /
-  Decisions / Open Questions-Risks / Updates (never blank a section), `confluence_update_page`.
+- **Update** — `confluence_get_page`, **merge** the change into Overview / Key Links /
+  Skills / Milestones / Decisions / Open Questions-Risks / Updates (never blank a section),
+  `confluence_update_page`.
 - **Close** — flip the page Status to Closed, move its link from the Active index list
   to the configured Closed index list.
 
