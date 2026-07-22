@@ -30,6 +30,14 @@ update / close mechanics rather than keeping their own copy.
   Active/Closed index page IDs. Do not create project pages until the Active index page ID is
   configured or explicitly discovered.
 
+> **Local fallback mode (Atlassian access blocked, since 2026-07-21).** While Confluence is
+> unreachable, this skill writes an interim local **`SOURCE_OF_TRUTH.docx`** in each project's
+> folder instead of a Confluence page. Confluence stays the canonical home — the local doc is a
+> bridge to migrate up once access is restored. See "Local fallback mode" below and
+> `references/canonical-project-page.md` → "Local fallback mode". Detect the block when any
+> `confluence_*` call returns 401/403 or the Confluence/Atlassian MCP server is disabled or
+> unreachable, or when the user asks for the local doc explicitly.
+
 ## When to use
 
 - **Create** — a new project or initiative needs its canonical page (e.g. after a kickoff
@@ -91,13 +99,42 @@ a project row only if Dan wants it. Never require the workbook.
 Report the page title, URL, its index-list membership (Active/Closed), whether it was
 created / updated / closed and what changed, and any GTD linkage made.
 
+## Local fallback mode (Atlassian unavailable)
+
+When Confluence can't be reached (see the callout at the top), do everything the same —
+identify the project, gather context (§2), apply the **page content rules** — but read/write a
+local `SOURCE_OF_TRUTH.docx` instead of a Confluence page, per
+`references/canonical-project-page.md` → "Local fallback mode". In short:
+
+1. **Locate the project folder.** For a GTD project, use its SharePoint/working folder (the same
+   one that would go under Key Links); read column **O** notes for a folder hint. For an ad-hoc
+   project, ask Dan for the folder path. The file is `<project folder>\SOURCE_OF_TRUTH.docx`.
+2. **Create** — build the content model (see the renderer's JSON shape) and render:
+   `& "C:\Program Files\Python312\python.exe" scripts/source_of_truth_docx.py render --input model.json --output "<folder>\SOURCE_OF_TRUTH.docx"`.
+3. **Update — read, merge, re-render (never edit in place; Word COM is broken here).** First
+   `... source_of_truth_docx.py read --input "<folder>\SOURCE_OF_TRUTH.docx"` to get the current
+   model, apply the **same merge rules** as a page (update Overview cells, append Decisions,
+   prepend dated Updates, add Milestones/Risks — never blank a section), then `render` the full
+   model back to the same path.
+4. **Close** — set the model's `status` to `Closed`/`Complete` and prepend a dated Updates entry;
+   re-render. (There are no Active/Closed index lists locally.)
+5. **When Atlassian access returns**, offer to migrate each `SOURCE_OF_TRUTH.docx` up to a proper
+   Confluence page (the model maps 1:1 to the storage-format body template) and then treat
+   Confluence as canonical again.
+
+The renderer embeds the content model as `word/sotdata.json` inside the `.docx`, so `read` round-
+trips losslessly; if that part is ever missing it falls back to parsing the document headings.
+Never hand-edit the `.docx`.
+
 ## References & scripts
 
 - `references/canonical-project-page.md` — the authoritative create / update / close mechanics,
-  Confluence page mechanics, body template, and page content rules. **This is the file the GTD
-  skills and `/close-day` point at.**
+  body template, page content rules, **and the local-fallback mechanics**. **This is the file
+  the GTD skills and `/close-day` point at.**
 - `references/confluence-instance.md` — configuration resolution rules and fresh-install setup.
 - `references/context-sources.md` — how to gather context from each source, read-only.
+- `scripts/source_of_truth_docx.py` — render/read the interim local `SOURCE_OF_TRUTH.docx`
+  (fallback mode). Run via `C:\Program Files\Python312\python.exe`.
 - `scripts/read_msg.py` — parse a saved Outlook `.msg` file (subject/from/to/date/attachments/
   body). Run with `py`, `python`, or a known full Python interpreter path.
 

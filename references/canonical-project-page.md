@@ -220,6 +220,76 @@ Note: the page's tree parent stays under Active Projects (the tools can't
 re-parent); the index-list membership is what marks it closed. The user can drag it in
 the Confluence tree manually if they want the hierarchy to match.
 
+## Local fallback mode (Atlassian access blocked)
+
+**Standing situation (since 2026-07-21):** Dan's Atlassian account was replaced and the org
+admin has **blocked API-token creation** for Jira/Confluence, so the `my-atlassian` MCP server
+authenticates but every `confluence_*`/`jira_*` call returns 401/403. Until access is restored,
+maintain each project's source of truth as a local Word document instead of a Confluence page.
+
+**Confluence stays canonical.** The local `.docx` is an interim bridge; migrate it up to a proper
+page once access returns. Keep the same **Page content rules** (spell out acronyms, no notes/
+capture-tool links, no GTD keys, plain-language status) so migration is a clean lift.
+
+**When to use it:** any `confluence_*` call returns 401/403, the `my-atlassian` server is
+disabled/unreachable, or Dan asks for the local doc explicitly. Otherwise use Confluence as normal.
+
+### Where the file goes
+
+`<project folder>\SOURCE_OF_TRUTH.docx` — one per project, in that project's working folder
+(the same SharePoint/OneDrive folder that would appear under Key Links). For a GTD project, take
+the folder from its workbook notes (column **O**) or the known working location; for an ad-hoc
+project, ask Dan for the folder path. There are no Active/Closed index lists locally — a project's
+state lives in the doc's **Status**.
+
+### Renderer
+
+`scripts/source_of_truth_docx.py`, run via `C:\Program Files\Python312\python.exe`. The content
+model (JSON) maps 1:1 to the storage-format body template above:
+
+| Page section | Model key |
+|---|---|
+| Overview paragraph | `overview` |
+| Status / Owner / Area / Target date | `status` / `owner` / `area` / `target_date` |
+| Key Links | `key_links` (list) |
+| Milestones | `milestones` (list) |
+| Decisions | `decisions` (list, dated) |
+| Open Questions / Risks | `risks` (list) |
+| Updates | `updates` (list, **reverse-chronological**, dated) |
+
+The renderer embeds the model as `word/sotdata.json` inside the `.docx` so updates round-trip
+losslessly (with a heading-parser fallback if that part is ever dropped). Never hand-edit the file.
+
+### Create
+
+Build the model from gathered context and render:
+
+```
+& "C:\Program Files\Python312\python.exe" scripts/source_of_truth_docx.py `
+    render --input model.json --output "<project folder>\SOURCE_OF_TRUTH.docx"
+```
+
+### Update — read, merge, re-render (Word can't be edited in place here)
+
+1. Read the current model:
+   `... source_of_truth_docx.py read --input "<folder>\SOURCE_OF_TRUTH.docx"` (prints JSON).
+2. **Merge, never overwrite** — same rules as a page: update only changed Overview cells; mark/
+   add Milestones; **append** dated Decisions; add/resolve Risks; **prepend** a dated Updates
+   bullet (ISO date from `currentDate`). Never blank a section.
+3. Render the full merged model back to the same path.
+
+### Close
+
+Set `status` to `Closed`/`Complete`, prepend a dated Updates entry noting completion, and
+re-render.
+
+### Migrating back to Confluence (when access returns)
+
+For each `SOURCE_OF_TRUTH.docx`, `read` the model, build the storage-format body from the mapping
+table above, create/update the canonical page per the sections above, add it to the Active (or
+Closed) index list, and link it from the GTD workbook if tracked. Then treat Confluence as
+canonical again.
+
 ## Linking to the GTD workbook (optional)
 
 Only when the project is tracked in a Getting Things Done (GTD) workbook — otherwise skip this section entirely.
